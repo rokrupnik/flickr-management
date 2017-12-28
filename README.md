@@ -3,7 +3,7 @@ A collection of a few simple python scripts for managing you flickr account.
 
 # Requirements
 * python 2.7
-* [`flickrapi` library](https://github.com/sybrenstuvel/flickrapi) -> 'pip install flickrapi'
+* [`flickrapi` library](https://github.com/sybrenstuvel/flickrapi) -> `pip install flickrapi`
 
 # Usage
 1. Rename `flickr_account.example.py` to `flickr_account.py` and insert your API key, secret and user id.  
