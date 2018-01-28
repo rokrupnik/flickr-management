@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
 """
     A script that downloads the list of all photosets, orders them by title and
     then uploads the new photosets order on your flickr account.
 """
+
+import sys
 
 # Removing annoying warnings
 
@@ -27,8 +30,10 @@ sorted_sets = sorted(sets, key=lambda set: set['title']['_content'], reverse=Tru
 sorted_sets_ids = [set['id'] for set in sorted_sets]
 
 print '\n------------------------------before-----------------------------------\n'
-print '\n'.join([set['title']['_content'] for set in sets])
+for set_o in sets:
+    print unicode(set_o['title']['_content']).encode(sys.stdout.encoding, errors='replace')
 print '\n------------------------------after------------------------------------\n'
-print '\n'.join([set['title']['_content'] for set in sorted_sets])
+for set_s in sorted_sets:
+    print unicode(set_s['title']['_content']).encode(sys.stdout.encoding, errors='replace')
 
 flickr.photosets.orderSets(photoset_ids=','.join(sorted_sets_ids))
