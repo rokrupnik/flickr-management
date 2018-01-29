@@ -1,2 +1,4 @@
 *.pyc
 flickr_account.py
+upload/*
+*.log

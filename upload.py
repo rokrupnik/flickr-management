@@ -72,6 +72,8 @@ def callback(progress, old_progress):
     if (progress != old_progress):
         print str(progress) + '%',
 
+# Note: .vro and .MPG extensions are not recognised by flickr API
+# .mpg videos can be uploaded manually
 ALLOWED_FILETYPES = ('png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff', 'raw', 'mp4', 'mov', 'avi', 'vob', '3gp')
 
 flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
@@ -79,24 +81,41 @@ flickr.authenticate_via_browser(perms='write')
 ####################################################################################################
 
 ####################################################################################################
-# Init walk_dir
+# Init base_path
 
-walk_dir = sys.argv[1]
+def path_to_folders(path):
+    folders = []
+    while 1:
+        path, folder = os.path.split(path)
 
-print 'walk_dir = ' + walk_dir
+        if folder != "":
+            folders.append(folder)
+        else:
+            if path != "":
+                folders.append(path)
+
+            break
+
+    folders.reverse()
+
+    return folders
+
+base_path = unicode(sys.argv[1])
+
+print 'base_path = ' + base_path
 
 # If your current working directory may change during script execution, it's recommended to
 # immediately convert program arguments to an absolute path. Then the variable root below will
 # be an absolute path as well. Example:
-# walk_dir = os.path.abspath(walk_dir)
-print 'walk_dir (absolute) = ' + os.path.abspath(walk_dir)
+# base_path = os.path.abspath(base_path)
+print 'base_path (absolute) = ' + os.path.abspath(base_path)
 ####################################################################################################
 
 ####################################################################################################
 # Actual directory iteration and upload
 
-for root, subdirs, files in os.walk(walk_dir):
-    print '--\nroot = ' + root
+for root, subdirs, files in os.walk(base_path):
+    print '--\nroot = ' + repr(root)
 
     # sort files and subdirs by name
     files = sorted(files)
@@ -107,7 +126,7 @@ for root, subdirs, files in os.walk(walk_dir):
         file_path = os.path.join(root, filename)
         # upload only photos and video
         if not(filename.lower().endswith(ALLOWED_FILETYPES)):
-            print '\terror: wrong file type in file %s (full path: %s)\n\t' % (filename, file_path),
+            print '\terror: wrong file type in file %s (full path: %s)\n\t' % (repr(filename), repr(file_path)),
             continue
 
         if (photoset_id == 0):
@@ -118,7 +137,7 @@ for root, subdirs, files in os.walk(walk_dir):
             # title exists
 
             # upload primary photo and create photoset
-            print '\tuploading primary photo: %s (full path: %s)\n\t' % (filename, file_path),
+            print '\tuploading primary photo: %s (full path: %s)\n\t' % (repr(filename), repr(file_path)),
 
             try:
                 fileobj = FileWithCallback(file_path, callback)
@@ -132,9 +151,12 @@ for root, subdirs, files in os.walk(walk_dir):
                 primary_photo_id = rsp.photoid[0].text
                 print '\n\tuploaded primary photo with id: ' + primary_photo_id
 
-                print '\tcreating photoset with title ' + os.path.split(root)[1]
+                title = '/'.join(path_to_folders(root.replace(base_path, ''))[1:])
+
+                print '\tcreating photoset with title ' + repr(title)
+
                 rsp = flickr.photosets.create(
-                    title=os.path.split(root)[1],
+                    title=title,
                     primary_photo_id=primary_photo_id
                 )
                 photoset_id = rsp['photoset']['id']
@@ -149,7 +171,7 @@ for root, subdirs, files in os.walk(walk_dir):
             # and adding them to created photoset
             try:
 
-                print '\tuploading file %s (full path: %s)\n\t' % (filename, file_path),
+                print '\tuploading file %s (full path: %s)\n\t' % (repr(filename), repr(file_path)),
 
                 # upload photos and add them to the photoset
                 fileobj = FileWithCallback(file_path, callback)
@@ -171,7 +193,7 @@ for root, subdirs, files in os.walk(walk_dir):
 
     # Print all subdirs
     for subdir in subdirs:
-        print '\t- subdirectory ' + subdir
+        print '\t- subdirectory ' + repr(subdir)
 
     print_time(CHECKPOINT)
     CHECKPOINT = time.time()
