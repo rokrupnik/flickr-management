@@ -74,7 +74,7 @@ def callback(progress, old_progress):
 
 # Note: .vro and .MPG extensions are not recognised by flickr API
 # .mpg videos can be uploaded manually
-ALLOWED_FILETYPES = ('png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff', 'raw', 'mp4', 'mov', 'avi', 'vob', '3gp')
+ALLOWED_FILETYPES = ('png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff', 'raw', 'mp4', 'mov', 'avi', 'vob', '3gp', 'wmv')
 
 flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
 flickr.authenticate_via_browser(perms='write')
